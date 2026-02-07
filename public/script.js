@@ -1,4 +1,4 @@
-// Partículas (Copiado simplificado do Atlas)
+// ... (código de partículas igual ao anterior) ...
 const canvas = document.getElementById('particles');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
@@ -40,28 +40,28 @@ function animateParticles() {
 
 initParticles();
 
-// Lógica do Site
+// --- LÓGICA DO SITE ---
+
 const loginScreen = document.getElementById('login-screen');
 const downloadScreen = document.getElementById('download-screen');
 const msgBox = document.getElementById('login-msg');
 
-// 1. Verificar URL para Modo Dev
+// 1. Verificar Modo Dev (URL: ?dev=SENHA)
 const urlParams = new URLSearchParams(window.location.search);
 const devToken = urlParams.get('dev');
 
 if (devToken) {
-    // Se tiver token na URL, tenta carregar painel
     document.getElementById('dev-panel').classList.add('active');
     loadKeys();
 }
 
-// 2. Login
+// 2. Verificar Chave (Login)
 async function verifyKey() {
     const key = document.getElementById('access-key').value.trim();
     if (!key) return;
 
     msgBox.style.color = '#fff';
-    msgBox.innerText = 'Verificando...';
+    msgBox.innerText = 'Verificando com o servidor...';
 
     try {
         const res = await fetch('/api/verify', {
@@ -78,22 +78,22 @@ async function verifyKey() {
             localStorage.setItem('atlas_key', key);
         } else {
             msgBox.style.color = '#ff2a6d';
-            msgBox.innerText = data.error;
+            msgBox.innerText = data.error || 'Erro desconhecido';
         }
     } catch (e) {
-        msgBox.innerText = 'Erro de conexão.';
+        console.error(e);
+        msgBox.innerText = 'Erro de conexão com o servidor.';
     }
 }
 
-// Auto-login se já tiver chave salva
+// Auto-login se já tiver chave no navegador
 if (localStorage.getItem('atlas_key')) {
     document.getElementById('access-key').value = localStorage.getItem('atlas_key');
-    // verifyKey(); // Opcional: auto entrar
 }
 
-// 3. Download
+// 3. Iniciar Download
 function startDownload() {
-    // Link direto para o arquivo EXE (exemplo)
+    // Certifique-se de que o arquivo está em public/assets/AtlasAI Setup.exe
     window.location.href = '/assets/AtlasAI Setup.exe';
 }
 
@@ -101,20 +101,27 @@ function startDownload() {
 async function loadKeys() {
     try {
         const res = await fetch('/api/admin/keys', {
-            headers: { 'admin-token': devToken } // Aquele token do .env
+            headers: { 'admin-token': devToken }
         });
-        const keys = await res.json();
         
+        if (!res.ok) {
+            console.error("Falha ao carregar chaves. Token inválido?");
+            return;
+        }
+
+        const keys = await res.json();
         const tbody = document.querySelector('#keys-table tbody');
         tbody.innerHTML = '';
         
         keys.forEach(k => {
             const row = `<tr>
-                <td><code style="color:var(--primary)">${k.key_code}</code></td>
+                <td><span class="key-display">${k.key_code}</span></td>
                 <td>${k.name || '-'}</td>
-                <td>${k.duration_hours === -1 ? '∞' : k.duration_hours + 'h'}</td>
-                <td>${k.used_by_ip || '<span style="opacity:0.5">Não usado</span>'}</td>
-                <td>${checkStatus(k)}</td>
+                <td>${k.duration_hours === -1 ? 'Ilimitado' : k.duration_hours + 'h'}</td>
+                <td>${k.used_by_ip ? k.used_by_ip : '<span style="color:#00ff9d">Livre</span>'}</td>
+                <td>
+                    <button onclick="copyToClipboard('${k.key_code}')" style="background:transparent; border:1px solid #666; color:#fff; cursor:pointer;"><i class="fas fa-copy"></i></button>
+                </td>
             </tr>`;
             tbody.innerHTML += row;
         });
@@ -123,26 +130,47 @@ async function loadKeys() {
     }
 }
 
-function checkStatus(key) {
-    if (!key.first_used_at) return '<span style="color:#00ff9d">Novo</span>';
-    // Adicione lógica de expirado aqui se quiser visualmente
-    return '<span style="color:orange">Ativo</span>';
-}
-
 async function generateKey() {
     const name = document.getElementById('new-key-name').value;
     const duration = document.getElementById('new-key-duration').value;
+    const btn = document.querySelector('.btn-generate');
 
-    const res = await fetch('/api/admin/keys', {
-        method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json',
-            'admin-token': devToken 
-        },
-        body: JSON.stringify({ name, duration })
+    if(!name) return alert("Digite um nome para identificar a chave");
+
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
+    btn.disabled = true;
+
+    try {
+        const res = await fetch('/api/admin/keys', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'admin-token': devToken 
+            },
+            body: JSON.stringify({ name, duration })
+        });
+        
+        const data = await res.json();
+
+        if (res.ok) {
+            await loadKeys();
+            document.getElementById('new-key-name').value = '';
+            alert(`Chave criada: ${data.key}`);
+        } else {
+            alert("Erro ao criar chave: " + JSON.stringify(data));
+        }
+    } catch (e) {
+        alert("Erro de conexão ao criar chave.");
+    } finally {
+        btn.innerHTML = '<i class="fas fa-plus"></i> Gerar Chave';
+        btn.disabled = false;
+    }
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Chave copiada: " + text);
     });
-    
-    if (res.ok) loadKeys();
 }
 
 function toggleDevPanel() {
