@@ -30,31 +30,36 @@
     <div id="download-screen" class="screen">
         <nav>
             <div class="nav-logo">
-                <!-- Pequena logo no canto superior esquerdo -->
-                <img src="assets/AtlasAI_PFP_NoBG.png" alt="Logo Small">
+                <img src="assets/AtlasAI_PFP_NoBG.png" alt="Atlas Logo">
             </div>
+            
             <div class="nav-links">
                 <a href="#">Resources</a>
                 <a href="#">Community</a>
                 <a href="#">Support</a>
+                
+                <!-- Status e Logout -->
+                <div class="user-status">
+                    <i class="fas fa-check-circle"></i> Access Verified
+                </div>
+                <button onclick="logout()" class="btn-logout" title="Exit">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
             </div>
-            <div class="user-status"><i class="fas fa-check-circle"></i> Access Verified</div>
         </nav>
 
         <header class="hero-section">
-            <!-- IMAGEM PRINCIPAL COM TEXTO INTEGRADO -->
+            <!-- Logo ajustada pelo CSS -->
             <img src="assets/AtlasAI_NoBG_Web.png" alt="Atlas AI Title" class="hero-logo">
             
             <h2 class="hero-subtitle">YOUR SECOND BRAIN</h2>
             <p class="hero-desc">Organize, grow and evolve your productivity with local artificial intelligence.</p>
 
-            <!-- BOTÃO AZUL GLOW -->
             <button class="btn-download-neo" onclick="startDownload()">
                 Download for Windows
                 <span class="btn-info">v1.1.0 • Installer .exe</span>
             </button>
 
-            <!-- AVISO OLLAMA EMBAIXO -->
             <div class="requirements-text">
                 <i class="fas fa-info-circle"></i>
                 <span>Requires <strong>Ollama</strong> installed previously.</span>
@@ -63,8 +68,8 @@
         </header>
 
         <section class="news-grid">
-            <!-- Card 1 -->
-            <div class="card">
+            <!-- Seus cards aqui (Brain Hub, Google, Privacy)... -->
+             <div class="card">
                 <div class="card-icon-area">
                     <i class="fas fa-brain" style="font-size: 3em; color: var(--primary); filter: drop-shadow(0 0 10px var(--primary));"></i>
                 </div>
@@ -75,7 +80,6 @@
                 </div>
             </div>
 
-            <!-- Card 2 -->
             <div class="card">
                 <div class="card-icon-area">
                     <i class="fab fa-google" style="font-size: 3em; color: #ff4b4b; filter: drop-shadow(0 0 10px #ff4b4b);"></i>
@@ -87,7 +91,6 @@
                 </div>
             </div>
 
-            <!-- Card 3 -->
             <div class="card">
                 <div class="card-icon-area">
                     <i class="fas fa-shield-alt" style="font-size: 3em; color: #10b981; filter: drop-shadow(0 0 10px #10b981);"></i>
@@ -99,6 +102,11 @@
                 </div>
             </div>
         </section>
+
+        <!-- FOOTER NOVO -->
+        <footer>
+            <p>&copy; 2026 Dollengo. All rights reserved.</p>
+        </footer>
     </div>
 
     <!-- PAINEL DO DESENVOLVEDOR (Mantido igual) -->
