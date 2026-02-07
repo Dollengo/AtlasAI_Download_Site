@@ -1,14 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
 
 :root {
-    --bg-deep: #02040a;       /* Fundo quase preto azulado */
-    --bg-card: #0b1021;       /* Fundo dos cards */
+    --bg-deep: #02040a;
+    --bg-card: #0b1021;
     --primary: #00f0ff;       /* Ciano Neon */
     --secondary: #0066ff;     /* Azul Royal */
     --text-main: #ffffff;
     --text-muted: #94a3b8;
-    --glass: rgba(11, 16, 33, 0.6);
-    --border-glow: rgba(0, 240, 255, 0.2);
+    --glass: rgba(11, 16, 33, 0.85);
+    --border-glow: rgba(0, 240, 255, 0.3);
+    --danger: #ff2a6d;
 }
 
 body {
@@ -17,6 +18,7 @@ body {
     background-color: var(--bg-deep);
     color: var(--text-main);
     overflow-x: hidden;
+    /* Fundo sutil */
     background-image: 
         radial-gradient(circle at 50% 0%, rgba(0, 102, 255, 0.15) 0%, transparent 50%),
         radial-gradient(circle at 80% 80%, rgba(0, 240, 255, 0.05) 0%, transparent 40%);
@@ -32,23 +34,101 @@ body {
     pointer-events: none;
 }
 
+/* --- GESTÃO DE TELAS --- */
+.screen {
+    display: none; /* Esconde tudo por padrão */
+    min-height: 100vh;
+    animation: fadeIn 0.8s ease;
+}
+
+/* Tela de login precisa de Flex para centralizar */
+#login-screen.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* Tela de download é bloco normal */
+#download-screen.active {
+    display: block;
+}
+
+/* --- TELA DE LOGIN ESTILIZADA --- */
+.login-box {
+    background: var(--glass);
+    padding: 50px;
+    border-radius: 20px;
+    border: 1px solid var(--border-glow);
+    text-align: center;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 80px rgba(0, 102, 255, 0.15);
+    max-width: 450px;
+    width: 90%;
+    position: relative;
+}
+
+.input-group {
+    display: flex;
+    margin-top: 30px;
+    position: relative;
+}
+
+.input-group input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #334155;
+    padding: 15px 20px;
+    color: var(--primary);
+    font-family: monospace;
+    font-size: 1.2em;
+    outline: none;
+    border-radius: 8px 0 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: 0.3s;
+}
+
+.input-group input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+}
+
+.input-group button {
+    background: var(--primary);
+    border: none;
+    padding: 0 25px;
+    cursor: pointer;
+    color: #000;
+    font-size: 1.2em;
+    border-radius: 0 8px 8px 0;
+    transition: 0.3s;
+}
+
+.input-group button:hover {
+    background: #fff;
+    box-shadow: 0 0 20px var(--primary);
+}
+
+#login-msg {
+    margin-top: 20px;
+    height: 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+
 /* --- NAV BAR --- */
 nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 40px;
+    background: rgba(2, 4, 10, 0.8);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255,255,255,0.05);
-    position: fixed;
-    width: 100%;
-    box-sizing: border-box;
+    position: sticky;
     top: 0;
     z-index: 100;
-}
-
-.nav-logo img {
-    height: 32px;
 }
 
 .nav-links a {
@@ -61,44 +141,39 @@ nav {
     text-transform: uppercase;
     letter-spacing: 1px;
 }
-
-.nav-links a:hover {
-    color: var(--primary);
-    text-shadow: 0 0 10px var(--primary);
-}
+.nav-links a:hover { color: var(--primary); text-shadow: 0 0 10px var(--primary); }
 
 .user-status {
-    color: #10b981; /* Verde verificado */
+    color: #10b981;
     font-size: 0.85em;
     background: rgba(16, 185, 129, 0.1);
-    padding: 5px 12px;
-    border-radius: 20px;
+    padding: 5px 15px;
+    border-radius: 50px;
     border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
-/* --- HERO SECTION --- */
+/* --- HERO & CONTENT --- */
 .hero-section {
-    height: 100vh;
+    min-height: 80vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding-top: 60px;
+    padding: 20px;
 }
 
 .hero-logo {
-    max-width: 600px;
-    width: 90%;
-    height: auto;
-    filter: drop-shadow(0 0 30px rgba(0, 102, 255, 0.3));
+    max-width: 550px;
+    width: 100%;
+    filter: drop-shadow(0 0 40px rgba(0, 102, 255, 0.2));
     animation: float 6s ease-in-out infinite;
 }
 
 .hero-subtitle {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 800;
-    margin: -20px 0 20px 0;
+    margin: -10px 0 20px 0;
     background: linear-gradient(180deg, #fff, #94a3b8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -106,19 +181,12 @@ nav {
     font-style: italic;
 }
 
-.hero-desc {
-    color: var(--text-muted);
-    font-size: 1.1rem;
-    max-width: 600px;
-    margin-bottom: 40px;
-    line-height: 1.6;
-}
+.hero-desc { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin-bottom: 40px; }
 
-/* --- BUTTON NEON (Novo Estilo) --- */
 .btn-download-neo {
     background: linear-gradient(90deg, #0066ff, #00c6ff);
     color: white;
-    padding: 18px 60px;
+    padding: 18px 50px;
     border-radius: 50px;
     font-size: 1.1rem;
     font-weight: 700;
@@ -126,150 +194,131 @@ nav {
     cursor: pointer;
     text-transform: uppercase;
     letter-spacing: 1px;
-    box-shadow: 0 0 20px rgba(0, 102, 255, 0.4);
+    box-shadow: 0 0 25px rgba(0, 102, 255, 0.4);
     transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
 }
+.btn-download-neo:hover { transform: translateY(-3px); box-shadow: 0 0 50px rgba(0, 198, 255, 0.6); }
 
-.btn-download-neo:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 40px rgba(0, 198, 255, 0.6);
-}
-
-.btn-download-neo:active {
-    transform: scale(0.98);
-}
-
-.btn-info {
-    display: block;
-    font-size: 0.65em;
-    font-weight: 400;
-    opacity: 0.9;
-    margin-top: 4px;
-    text-transform: none;
-}
-
-/* --- OLLAMA REQUIREMENTS --- */
 .requirements-text {
-    margin-top: 25px;
+    margin-top: 30px;
     color: var(--text-muted);
     font-size: 0.9em;
-    display: flex;
-    align-items: center;
-    gap: 8px;
     background: rgba(255,255,255,0.03);
-    padding: 8px 16px;
-    border-radius: 8px;
+    padding: 10px 20px;
+    border-radius: 50px;
     border: 1px solid rgba(255,255,255,0.05);
 }
+.requirements-text a { color: var(--primary); text-decoration: none; border-bottom: 1px dashed var(--primary); }
 
-.requirements-text a {
-    color: var(--primary);
-    text-decoration: none;
-    border-bottom: 1px dashed var(--primary);
-}
-
-.requirements-text a:hover {
-    color: #fff;
-    border-bottom-style: solid;
-}
-
-/* --- CARDS GRID --- */
 .news-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
     max-width: 1200px;
-    margin: 0 auto 100px auto;
-    padding: 0 20px;
+    margin: 50px auto;
+    padding: 0 20px 100px 20px;
 }
 
 .card {
-    background: var(--glass);
-    border: 1px solid var(--border-glow);
+    background: rgba(11, 16, 33, 0.6);
+    border: 1px solid rgba(255,255,255,0.05);
     border-radius: 16px;
     overflow: hidden;
-    backdrop-filter: blur(12px);
-    transition: 0.4s ease;
-    cursor: default;
+    backdrop-filter: blur(10px);
+    transition: 0.3s;
 }
+.card:hover { border-color: var(--primary); transform: translateY(-5px); }
+.card-icon-area { height: 120px; display: flex; align-items: center; justify-content: center; background: linear-gradient(180deg, rgba(0,240,255,0.05), transparent); }
+.card-content { padding: 25px; }
+.tag { color: var(--primary); font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 10px; }
+.card h3 { color: #fff; margin: 0 0 10px 0; font-size: 1.3em; }
+.card p { color: var(--text-muted); font-size: 0.9em; line-height: 1.5; margin: 0; }
 
-.card:hover {
-    transform: translateY(-5px);
-    border-color: var(--primary);
-    box-shadow: 0 10px 30px -10px rgba(0, 240, 255, 0.15);
-}
-
-.card-icon-area {
-    height: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(180deg, rgba(0,240,255,0.05) 0%, transparent 100%);
-}
-
-.card-content {
-    padding: 25px;
-}
-
-.tag {
-    color: var(--primary);
-    font-size: 0.75em;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-    display: block;
-}
-
-.card h3 {
-    margin: 5px 0 10px 0;
-    font-size: 1.4em;
-    color: #fff;
-}
-
-.card p {
-    color: var(--text-muted);
-    font-size: 0.95em;
-    line-height: 1.5;
-}
-
-/* --- LOGIN SCREEN --- */
-#login-screen {
-    background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
-}
-
-.login-box {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 0 60px rgba(0,0,0,0.5);
-}
-
-.input-group input {
-    background: rgba(0,0,0,0.3);
-    border: 1px solid #334155;
-}
-.input-group input:focus {
-    border-color: var(--primary);
-}
-
-/* --- DEV PANEL --- */
+/* --- ADMIN PAINEL ESTILIZADO (IMPORTANTE) --- */
 .dev-panel {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 600px;
+    background: #050a14;
+    border: 1px solid var(--primary);
+    box-shadow: 0 0 50px rgba(0,0,0,0.8), 0 0 20px rgba(0, 240, 255, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    z-index: 9999;
+    font-family: 'Inter', sans-serif;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dev-panel.active { display: block; }
+
+.dev-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1e293b;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.dev-header h3 { margin: 0; color: var(--primary); font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; }
+
+.btn-close-dev { background: none; border: none; color: #64748b; cursor: pointer; font-size: 1.2em; transition: 0.2s; }
+.btn-close-dev:hover { color: #fff; }
+
+.dev-form {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+    background: rgba(255,255,255,0.03);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.dev-form input, .dev-form select {
     background: #0f172a;
-    color: #fff;
     border: 1px solid #334155;
+    color: #fff;
+    padding: 10px;
+    border-radius: 6px;
+    outline: none;
+    font-size: 0.9em;
 }
 
-/* ANIMATIONS */
-@keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-15px); }
-    100% { transform: translateY(0px); }
+.dev-form input:focus { border-color: var(--primary); }
+
+.btn-generate {
+    background: var(--primary);
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn-generate:hover { background: #fff; }
+
+.keys-table-container {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #1e293b;
+    border-radius: 6px;
 }
 
-@keyframes glowPulse {
-    0% { box-shadow: 0 0 10px rgba(0, 240, 255, 0.2); }
-    50% { box-shadow: 0 0 25px rgba(0, 240, 255, 0.5); }
-    100% { box-shadow: 0 0 10px rgba(0, 240, 255, 0.2); }
-}
+/* Scrollbar do Admin */
+.keys-table-container::-webkit-scrollbar { width: 5px; }
+.keys-table-container::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+th { background: #0f172a; color: var(--text-muted); text-align: left; padding: 12px; position: sticky; top: 0; font-weight: 600; }
+td { padding: 10px 12px; border-bottom: 1px solid #1e293b; color: #e2e8f0; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(0, 240, 255, 0.05); }
+
+.key-display { font-family: monospace; color: var(--primary); font-weight: bold; letter-spacing: 1px; }
+
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+@keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
