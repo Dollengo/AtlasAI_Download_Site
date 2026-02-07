@@ -1,22 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Beaufort+for+LOL:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
 
 :root {
-    --bg-deep: #030711;
-    --primary: #00f2ff;
-    --secondary: #0066ff;
-    --glass: rgba(13, 25, 48, 0.95);
-    --border: rgba(0, 242, 255, 0.3);
-    --text: #f0f6fc;
-    --danger: #ff2a6d;
-    --gold: #c8aa6e; 
+    --bg-deep: #02040a;       /* Fundo quase preto azulado */
+    --bg-card: #0b1021;       /* Fundo dos cards */
+    --primary: #00f0ff;       /* Ciano Neon */
+    --secondary: #0066ff;     /* Azul Royal */
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
+    --glass: rgba(11, 16, 33, 0.6);
+    --border-glow: rgba(0, 240, 255, 0.2);
 }
 
 body {
     margin: 0;
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-deep);
-    color: var(--text);
+    color: var(--text-main);
     overflow-x: hidden;
+    background-image: 
+        radial-gradient(circle at 50% 0%, rgba(0, 102, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 240, 255, 0.05) 0%, transparent 40%);
 }
 
 #particles {
@@ -26,335 +29,247 @@ body {
     width: 100%;
     height: 100%;
     z-index: -1;
+    pointer-events: none;
 }
 
-.screen {
-    display: none;
-    min-height: 100vh;
-}
-
-.screen.active {
-    display: block;
-    animation: fadeIn 0.5s ease;
-}
-
-/* LOGIN SCREEN */
-#login-screen {
-    display: none;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-#login-screen.active {
-    display: flex;
-}
-
-.login-box {
-    background: var(--glass);
-    padding: 40px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    text-align: center;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 50px rgba(0, 242, 255, 0.1);
-    max-width: 400px;
-    width: 90%;
-}
-
-.logo-glow {
-    height: 100px;
-    margin-bottom: 20px;
-    filter: drop-shadow(0 0 10px var(--primary));
-}
-
-.input-group {
-    display: flex;
-    margin-top: 20px;
-    border: 1px solid #333;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.input-group input {
-    flex: 1;
-    background: rgba(0,0,0,0.5);
-    border: none;
-    padding: 15px;
-    color: #fff;
-    font-family: monospace;
-    font-size: 1.1em;
-    outline: none;
-    text-transform: uppercase;
-}
-
-.input-group button {
-    background: var(--primary);
-    border: none;
-    padding: 0 20px;
-    cursor: pointer;
-    color: #000;
-    transition: 0.3s;
-}
-
-.input-group button:hover {
-    background: #fff;
-}
-
-#login-msg {
-    margin-top: 15px;
-    font-size: 0.9em;
-    min-height: 20px;
-}
-
-/* DOWNLOAD SCREEN (LOL STYLE) */
+/* --- NAV BAR --- */
 nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 50px;
-    background: rgba(0,0,0,0.5);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 20px 40px;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    position: fixed;
+    width: 100%;
+    box-sizing: border-box;
+    top: 0;
+    z-index: 100;
 }
 
-.nav-logo {
-    font-weight: 800;
-    font-size: 1.5em;
-    letter-spacing: 2px;
-    color: var(--gold);
-    display: flex;
-    align-items: center;
+.nav-logo img {
+    height: 32px;
 }
 
 .nav-links a {
-    color: #fff;
+    color: var(--text-muted);
     text-decoration: none;
-    margin: 0 15px;
-    font-weight: 600;
-    text-transform: uppercase;
+    margin: 0 20px;
     font-size: 0.9em;
+    font-weight: 500;
     transition: 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-.nav-links a:hover { color: var(--primary); }
+.nav-links a:hover {
+    color: var(--primary);
+    text-shadow: 0 0 10px var(--primary);
+}
 
 .user-status {
-    color: #00ff9d;
-    font-size: 0.9em;
+    color: #10b981; /* Verde verificado */
+    font-size: 0.85em;
+    background: rgba(16, 185, 129, 0.1);
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
-.hero-lol {
-    height: 70vh;
+/* --- HERO SECTION --- */
+.hero-section {
+    height: 100vh;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    background: radial-gradient(circle at center, rgba(0, 242, 255, 0.1) 0%, transparent 70%);
+    padding-top: 60px;
 }
 
-.hero-title-img { height: 100px; margin-bottom: 20px; }
+.hero-logo {
+    max-width: 600px;
+    width: 90%;
+    height: auto;
+    filter: drop-shadow(0 0 30px rgba(0, 102, 255, 0.3));
+    animation: float 6s ease-in-out infinite;
+}
 
-h2 {
-    font-size: 4em;
-    margin: 10px 0;
-    font-family: 'Beaufort for LOL', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    font-style: italic;
-    background: linear-gradient(to bottom, #f0e6d2, #c8aa6e);
+.hero-subtitle {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: -20px 0 20px 0;
+    background: linear-gradient(180deg, #fff, #94a3b8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
+    font-style: italic;
 }
 
-.requirements-box {
-    background: rgba(255, 200, 0, 0.1);
-    border: 1px solid rgba(255, 200, 0, 0.3);
-    padding: 10px 20px;
-    border-radius: 5px;
-    margin: 20px auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--gold);
+.hero-desc {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin-bottom: 40px;
+    line-height: 1.6;
 }
 
-.requirements-box a {
-    color: #fff;
-    text-decoration: underline;
-}
-
-.btn-download-lol {
-    position: relative;
-    background: transparent;
-    border: 2px solid var(--primary);
-    padding: 20px 60px;
-    color: var(--primary);
-    font-size: 1.2em;
-    font-weight: 800;
+/* --- BUTTON NEON (Novo Estilo) --- */
+.btn-download-neo {
+    background: linear-gradient(90deg, #0066ff, #00c6ff);
+    color: white;
+    padding: 18px 60px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
     cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 0 20px rgba(0, 102, 255, 0.4);
+    transition: all 0.3s ease;
+    position: relative;
     overflow: hidden;
-    transition: 0.3s;
-    margin-top: 20px;
 }
 
-.btn-download-lol:hover {
-    background: var(--primary);
-    color: #000;
-    box-shadow: 0 0 30px var(--primary);
+.btn-download-neo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 40px rgba(0, 198, 255, 0.6);
 }
 
-.btn-download-lol small {
+.btn-download-neo:active {
+    transform: scale(0.98);
+}
+
+.btn-info {
     display: block;
-    font-size: 0.6em;
+    font-size: 0.65em;
     font-weight: 400;
-    opacity: 0.8;
-    margin-top: 5px;
+    opacity: 0.9;
+    margin-top: 4px;
+    text-transform: none;
 }
 
-/* NEWS GRID */
+/* --- OLLAMA REQUIREMENTS --- */
+.requirements-text {
+    margin-top: 25px;
+    color: var(--text-muted);
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.03);
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.requirements-text a {
+    color: var(--primary);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--primary);
+}
+
+.requirements-text a:hover {
+    color: #fff;
+    border-bottom-style: solid;
+}
+
+/* --- CARDS GRID --- */
 .news-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-    padding: 50px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 0 auto 100px auto;
+    padding: 0 20px;
 }
 
 .card {
-    background: #091120;
-    border: 1px solid #1e2837;
-    transition: 0.3s;
-    cursor: pointer;
-    border-radius: 10px;
+    background: var(--glass);
+    border: 1px solid var(--border-glow);
+    border-radius: 16px;
     overflow: hidden;
+    backdrop-filter: blur(12px);
+    transition: 0.4s ease;
+    cursor: default;
 }
 
-.card:hover { transform: translateY(-10px); border-color: var(--gold); }
-
-.card-img {
-    height: 200px;
-    background-size: cover;
-    background-position: center;
+.card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 10px 30px -10px rgba(0, 240, 255, 0.15);
 }
 
-.card-content { padding: 20px; }
+.card-icon-area {
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, rgba(0,240,255,0.05) 0%, transparent 100%);
+}
+
+.card-content {
+    padding: 25px;
+}
 
 .tag {
     color: var(--primary);
-    font-size: 0.8em;
+    font-size: 0.75em;
     font-weight: 700;
     text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    display: block;
 }
 
-/* --- DEV PANEL ESTILIZADO --- */
-.dev-panel {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 650px;
-    background: #0b1221;
-    border: 1px solid var(--primary);
-    border-radius: 12px;
-    padding: 25px;
-    z-index: 1000;
-    box-shadow: 0 0 40px rgba(0,0,0,0.8);
-    display: none;
-    font-family: 'Inter', sans-serif;
-}
-
-.dev-panel.active { display: block; animation: slideUp 0.3s ease; }
-
-.dev-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 10px;
-}
-
-.dev-header h3 { margin: 0; color: var(--primary); }
-
-.btn-close-dev {
-    background: none;
-    border: none;
+.card h3 {
+    margin: 5px 0 10px 0;
+    font-size: 1.4em;
     color: #fff;
-    font-size: 1.2em;
-    cursor: pointer;
 }
 
-.dev-form {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 20px;
+.card p {
+    color: var(--text-muted);
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+/* --- LOGIN SCREEN --- */
+#login-screen {
+    background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+}
+
+.login-box {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 0 60px rgba(0,0,0,0.5);
+}
+
+.input-group input {
     background: rgba(0,0,0,0.3);
-    padding: 15px;
-    border-radius: 8px;
+    border: 1px solid #334155;
+}
+.input-group input:focus {
+    border-color: var(--primary);
 }
 
-.dev-form input, .dev-form select {
-    background: #030711;
-    border: 1px solid #333;
-    padding: 10px;
+/* --- DEV PANEL --- */
+.dev-panel {
+    background: #0f172a;
     color: #fff;
-    border-radius: 4px;
-    outline: none;
+    border: 1px solid #334155;
 }
 
-.dev-form input:focus { border-color: var(--primary); }
-
-.btn-generate {
-    background: var(--gold);
-    color: #000;
-    border: none;
-    font-weight: 700;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: 0.2s;
+/* ANIMATIONS */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
 }
 
-.btn-generate:hover {
-    background: #fff;
+@keyframes glowPulse {
+    0% { box-shadow: 0 0 10px rgba(0, 240, 255, 0.2); }
+    50% { box-shadow: 0 0 25px rgba(0, 240, 255, 0.5); }
+    100% { box-shadow: 0 0 10px rgba(0, 240, 255, 0.2); }
 }
-
-.keys-table-container {
-    max-height: 250px;
-    overflow-y: auto;
-    border: 1px solid #333;
-    border-radius: 4px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85em;
-}
-
-th {
-    background: #1a1a2e;
-    position: sticky;
-    top: 0;
-    color: var(--gold);
-    padding: 10px;
-    text-align: left;
-}
-
-td {
-    padding: 8px 10px;
-    border-bottom: 1px solid #222;
-    color: #ccc;
-}
-
-tr:hover td { background: rgba(255,255,255,0.05); }
-
-.key-display {
-    font-family: monospace;
-    color: var(--primary);
-    font-weight: bold;
-    font-size: 1.1em;
-}
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

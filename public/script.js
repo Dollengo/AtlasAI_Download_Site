@@ -20,7 +20,8 @@ class Particle {
         if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
     }
     draw() {
-        ctx.fillStyle = 'rgba(0, 242, 255, 0.5)';
+        // MUDANÇA: Cor Ciano (R:0, G:240, B:255)
+        ctx.fillStyle = 'rgba(0, 240, 255, 0.4)'; 
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AtlasAI</title>
+    <title>AtlasAI - Second Brain</title>
     <link rel="icon" type="image/png" href="assets/AtlasAI_PFP_NoBG.png">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,12 +11,12 @@
 <body>
     <canvas id="particles"></canvas>
 
-    <!-- TELA DE LOGIN (CHAVE) -->
+    <!-- LOGIN SCREEN -->
     <div id="login-screen" class="screen active">
         <div class="login-box">
-            <img src="assets/AtlasAI_PFP_NoBG.png" alt="Atlas Logo" class="logo-glow">
-            <h1>Acesso Restrito</h1>
-            <p>Insira sua chave de acesso para baixar o Atlas AI.</p>
+            <img src="assets/AtlasAI_PFP_NoBG.png" alt="Atlas Logo" class="logo-glow" style="height: 80px;">
+            <h1 style="font-size: 1.5rem; margin-top: 10px;">Restricted Access</h1>
+            <p style="color: #94a3b8; font-size: 0.9rem;">Enter your access key to download Atlas AI.</p>
             
             <div class="input-group">
                 <input type="text" id="access-key" placeholder="ATLAS-XXXX-XXXX">
@@ -26,77 +26,82 @@
         </div>
     </div>
 
-    <!-- TELA DE DOWNLOAD -->
+    <!-- DOWNLOAD SCREEN -->
     <div id="download-screen" class="screen">
         <nav>
             <div class="nav-logo">
-                <img src="assets/AtlasAI_PFP_NoBG.png" style="height:30px; vertical-align:middle; margin-right:10px;">
-                ATLAS AI
+                <!-- Pequena logo no canto superior esquerdo -->
+                <img src="assets/AtlasAI_PFP_NoBG.png" alt="Logo Small">
             </div>
             <div class="nav-links">
-                <a href="#">Recursos</a>
-                <a href="#">Comunidade</a>
-                <a href="#">Suporte</a>
+                <a href="#">Resources</a>
+                <a href="#">Community</a>
+                <a href="#">Support</a>
             </div>
-            <div class="user-status"><i class="fas fa-check-circle"></i> Acesso Verificado</div>
+            <div class="user-status"><i class="fas fa-check-circle"></i> Access Verified</div>
         </nav>
 
-        <header class="hero-lol">
-            <div class="hero-content">
-                <img src="assets/AtlasAI_NoBG_Web.png" alt="Atlas Title" class="hero-title-img">
-                <h2>YOUR SECOND BRAIN</h2>
-                <p>Organize, evolua e domine sua produtividade com inteligência artificial local.</p>
-                
-                <div class="requirements-box">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span>Requer <strong>Ollama</strong> instalado previamente.</span>
-                    <a href="https://ollama.com" target="_blank">Baixar Ollama <i class="fas fa-external-link-alt"></i></a>
-                </div>
+        <header class="hero-section">
+            <!-- IMAGEM PRINCIPAL COM TEXTO INTEGRADO -->
+            <img src="assets/AtlasAI_NoBG_Web.png" alt="Atlas AI Title" class="hero-logo">
+            
+            <h2 class="hero-subtitle">YOUR SECOND BRAIN</h2>
+            <p class="hero-desc">Organize, grow and evolve your productivity with local artificial intelligence.</p>
 
-                <button class="btn-download-lol" onclick="startDownload()">
-                    <div class="btn-bg"></div>
-                    <span>BAIXAR PARA WINDOWS</span>
-                    <small>v1.1.0 • Instalador .exe</small>
-                </button>
+            <!-- BOTÃO AZUL GLOW -->
+            <button class="btn-download-neo" onclick="startDownload()">
+                Download for Windows
+                <span class="btn-info">v1.1.0 • Installer .exe</span>
+            </button>
+
+            <!-- AVISO OLLAMA EMBAIXO -->
+            <div class="requirements-text">
+                <i class="fas fa-info-circle"></i>
+                <span>Requires <strong>Ollama</strong> installed previously.</span>
+                <a href="https://ollama.com" target="_blank">Get Ollama <i class="fas fa-external-link-alt"></i></a>
             </div>
         </header>
 
         <section class="news-grid">
-            <!-- Cards decorativos -->
+            <!-- Card 1 -->
             <div class="card">
-                <div class="card-img" style="background: linear-gradient(135deg, #0b1221 0%, #002244 100%); display:flex; align-items:center; justify-content:center;">
-                    <i class="fas fa-brain" style="font-size: 3em; color: var(--primary);"></i>
+                <div class="card-icon-area">
+                    <i class="fas fa-brain" style="font-size: 3em; color: var(--primary); filter: drop-shadow(0 0 10px var(--primary));"></i>
                 </div>
                 <div class="card-content">
-                    <span class="tag">Atualização 1.1</span>
-                    <h3>Brain Hub Chegou</h3>
-                    <p>Gerencie tarefas e metas diretamente no launcher.</p>
+                    <span class="tag">Version 1.1</span>
+                    <h3>Brain Hub</h3>
+                    <p>New productivity dashboard with integrated tasks, goals, and routines directly in your launcher.</p>
                 </div>
             </div>
+
+            <!-- Card 2 -->
             <div class="card">
-                <div class="card-img" style="background: linear-gradient(135deg, #0b1221 0%, #440022 100%); display:flex; align-items:center; justify-content:center;">
-                    <i class="fab fa-google" style="font-size: 3em; color: var(--danger);"></i>
+                <div class="card-icon-area">
+                    <i class="fab fa-google" style="font-size: 3em; color: #ff4b4b; filter: drop-shadow(0 0 10px #ff4b4b);"></i>
                 </div>
                 <div class="card-content">
                     <span class="tag">Sync</span>
                     <h3>Google Calendar</h3>
-                    <p>Sincronize sua agenda em tempo real.</p>
+                    <p>Two-way, real-time synchronization with your Google Calendar. Never miss a meeting.</p>
                 </div>
             </div>
+
+            <!-- Card 3 -->
             <div class="card">
-                <div class="card-img" style="background: linear-gradient(135deg, #0b1221 0%, #004400 100%); display:flex; align-items:center; justify-content:center;">
-                    <i class="fas fa-shield-alt" style="font-size: 3em; color: #00ff9d;"></i>
+                <div class="card-icon-area">
+                    <i class="fas fa-shield-alt" style="font-size: 3em; color: #10b981; filter: drop-shadow(0 0 10px #10b981);"></i>
                 </div>
                 <div class="card-content">
-                    <span class="tag">Privacidade</span>
-                    <h3>Totalmente Local</h3>
-                    <p>Seus dados nunca saem do seu computador.</p>
+                    <span class="tag">Privacy</span>
+                    <h3>Fully Local</h3>
+                    <p>Your data never leaves your device. The AI runs locally using your own hardware.</p>
                 </div>
             </div>
         </section>
     </div>
 
-    <!-- PAINEL DO DESENVOLVEDOR -->
+    <!-- PAINEL DO DESENVOLVEDOR (Mantido igual) -->
     <div id="dev-panel" class="dev-panel hidden">
         <div class="dev-header">
             <h3><i class="fas fa-terminal"></i> Atlas Admin</h3>
@@ -104,15 +109,15 @@
         </div>
         
         <div class="dev-form">
-            <input type="text" id="new-key-name" placeholder="Nome do Cliente (ex: João)">
+            <input type="text" id="new-key-name" placeholder="Client Name (ex: John)">
             <select id="new-key-duration">
-                <option value="24">24 Horas</option>
-                <option value="168">7 Dias</option>
-                <option value="720">30 Dias</option>
-                <option value="-1">Ilimitado</option>
+                <option value="24">24 Hours</option>
+                <option value="168">7 Days</option>
+                <option value="720">30 Days</option>
+                <option value="-1">Unlimited</option>
             </select>
             <button class="btn-generate" onclick="generateKey()">
-                <i class="fas fa-plus"></i> Gerar Chave
+                <i class="fas fa-plus"></i> Generate Key
             </button>
         </div>
 
@@ -120,11 +125,11 @@
             <table id="keys-table">
                 <thead>
                     <tr>
-                        <th>Chave</th>
-                        <th>Nome</th>
-                        <th>Duração</th>
-                        <th>IP Usado</th>
-                        <th>Ações</th>
+                        <th>Key</th>
+                        <th>Name</th>
+                        <th>Duration</th>
+                        <th>IP Used</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
