@@ -101,7 +101,7 @@ if (localStorage.getItem('atlas_key')) {
 // 3. Iniciar Download
 function startDownload() {
     // Certifique-se de que o arquivo está em public/assets/AtlasAI Setup.exe
-    window.location.href = '/assets/AtlasAI Setup.exe';
+    window.location.href = '/assets/AtlasAI_Setup.exe';
 }
 
 // 4. Funções de Admin
