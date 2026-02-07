@@ -61,7 +61,7 @@ async function verifyKey() {
     if (!key) return;
 
     msgBox.style.color = '#fff';
-    msgBox.innerText = 'Verificando com o servidor...';
+    msgBox.innerText = 'Verificando...';
 
     try {
         const res = await fetch('/api/verify', {
@@ -70,6 +70,12 @@ async function verifyKey() {
             body: JSON.stringify({ key })
         });
         
+        // Verifica se é JSON antes de fazer parse
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Erro de servidor (Resposta não é JSON).");
+        }
+
         const data = await res.json();
 
         if (res.ok) {
@@ -82,7 +88,8 @@ async function verifyKey() {
         }
     } catch (e) {
         console.error(e);
-        msgBox.innerText = 'Erro de conexão com o servidor.';
+        msgBox.style.color = '#ff2a6d';
+        msgBox.innerText = 'Erro de conexão ou servidor offline.';
     }
 }
 
@@ -105,12 +112,15 @@ async function loadKeys() {
         });
         
         if (!res.ok) {
-            console.error("Falha ao carregar chaves. Token inválido?");
-            return;
+            // Se der erro 500, não tenta ler JSON para não travar o console
+            console.error("Erro na API:", res.status);
+            return; 
         }
 
         const keys = await res.json();
         const tbody = document.querySelector('#keys-table tbody');
+        if(!tbody) return; // Segurança
+        
         tbody.innerHTML = '';
         
         keys.forEach(k => {
@@ -120,7 +130,7 @@ async function loadKeys() {
                 <td>${k.duration_hours === -1 ? 'Ilimitado' : k.duration_hours + 'h'}</td>
                 <td>${k.used_by_ip ? k.used_by_ip : '<span style="color:#00ff9d">Livre</span>'}</td>
                 <td>
-                    <button onclick="copyToClipboard('${k.key_code}')" style="background:transparent; border:1px solid #666; color:#fff; cursor:pointer;"><i class="fas fa-copy"></i></button>
+                    <button onclick="copyToClipboard('${k.key_code}')" class="btn-copy"><i class="fas fa-copy"></i></button>
                 </td>
             </tr>`;
             tbody.innerHTML += row;

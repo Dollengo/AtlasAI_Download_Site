@@ -15,14 +15,36 @@ const dbToken = process.env.TURSO_AUTH_TOKEN;
 
 if (!dbUrl || !dbToken) {
     console.error("ERRO CRÍTICO: Variáveis TURSO_DATABASE_URL ou TURSO_AUTH_TOKEN não definidas.");
+    process.exit(1);
 }
 
+// Inicializa o cliente DB
 const db = createClient({
     url: dbUrl,
     authToken: dbToken,
 });
 
-// Middleware para pegar IP
+// Inicializa a tabela se não existir
+async function initDB() {
+    try {
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS keys (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                key_code TEXT UNIQUE NOT NULL,
+                name TEXT,
+                duration_hours INTEGER DEFAULT 24,
+                used_by_ip TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                first_used_at DATETIME
+            )
+        `);
+        console.log("Banco de dados verificado/inicializado com sucesso.");
+    } catch (error) {
+        console.error("Erro ao conectar/inicializar banco:", error);
+    }
+}
+initDB();
+
 const getIP = (req) => {
     return req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress;
 };
@@ -32,7 +54,7 @@ app.post('/api/verify', async (req, res) => {
     const { key } = req.body;
     const userIP = getIP(req);
 
-    console.log(`Tentativa de login: Chave [${key}] - IP [${userIP}]`);
+    console.log(`Login: [${key}] - IP [${userIP}]`);
 
     try {
         const result = await db.execute({
@@ -41,19 +63,17 @@ app.post('/api/verify', async (req, res) => {
         });
 
         if (result.rows.length === 0) {
-            console.log("Chave não encontrada no banco.");
-            return res.status(401).json({ error: "Chave inválida ou inexistente." });
+            return res.status(401).json({ error: "Chave inválida." });
         }
 
         const keyData = result.rows[0];
 
-        // 1. Verificar IP (se já foi usada)
+        // 1. Verificar IP
         if (keyData.used_by_ip && keyData.used_by_ip !== userIP) {
-            console.log(`IP Bloqueado. Original: ${keyData.used_by_ip}, Tentativa: ${userIP}`);
-            return res.status(403).json({ error: "Chave vinculada a outro dispositivo." });
+            return res.status(403).json({ error: "Chave já usada em outro PC." });
         }
 
-        // 2. Vincular IP se for nova
+        // 2. Vincular IP
         if (!keyData.used_by_ip) {
             await db.execute({
                 sql: "UPDATE keys SET used_by_ip = ?, first_used_at = datetime('now') WHERE id = ?",
@@ -61,18 +81,16 @@ app.post('/api/verify', async (req, res) => {
             });
         }
 
-        // 3. Verificar tempo (expiração)
-        // Se duration_hours for diferente de -1, checa o tempo
+        // 3. Verificar tempo
         if (keyData.duration_hours !== -1 && keyData.first_used_at) {
-            // Turso retorna datas como string UTC ou numérico dependendo da configuração.
-            // Vamos assumir string ISO gerada pelo datetime('now')
-            const firstUsed = new Date(keyData.first_used_at + "Z"); // Força UTC
+            const firstUsed = new Date(keyData.first_used_at + "Z"); // Força UTC se necessário
             const now = new Date();
-            const hoursPassed = (now - firstUsed) / 36e5;
-
-            if (hoursPassed > keyData.duration_hours) {
-                console.log("Chave expirada.");
-                return res.status(403).json({ error: "Esta chave expirou." });
+            // Fallback se a data vier inválida (null ou formato errado)
+            if(!isNaN(firstUsed.getTime())) {
+                 const hoursPassed = (now - firstUsed) / 36e5;
+                 if (hoursPassed > keyData.duration_hours) {
+                     return res.status(403).json({ error: "Chave expirada." });
+                 }
             }
         }
 
@@ -80,44 +98,36 @@ app.post('/api/verify', async (req, res) => {
 
     } catch (error) {
         console.error("ERRO NO VERIFY:", error);
-        res.status(500).json({ error: "Erro interno no servidor. Verifique os logs." });
+        res.status(500).json({ error: "Erro interno. Tente novamente." });
     }
 });
 
-// --- ROTA: Admin Auth Check ---
 const adminAuth = (req, res, next) => {
     const token = req.headers['admin-token'];
-    if (token !== process.env.ADMIN_TOKEN) {
+    if (!process.env.ADMIN_TOKEN || token !== process.env.ADMIN_TOKEN) {
         return res.status(403).json({ error: "Acesso negado." });
     }
     next();
 };
 
-// --- ROTA: Listar Chaves ---
 app.get('/api/admin/keys', adminAuth, async (req, res) => {
     try {
         const result = await db.execute("SELECT * FROM keys ORDER BY created_at DESC");
         res.json(result.rows);
     } catch (error) {
-        console.error("Erro ao listar:", error);
-        res.status(500).json({ error: error.message });
+        console.error("Erro admin list:", error);
+        res.status(500).json({ error: "Erro ao buscar chaves" });
     }
 });
 
-// --- ROTA: Criar Chave ---
 app.post('/api/admin/keys', adminAuth, async (req, res) => {
     const { name, duration } = req.body;
     
-    // Gera chave aleatória
     const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase() + 
                        "-" + 
                        Math.random().toString(36).substring(2, 6).toUpperCase();
     const keyCode = `ATLAS-${randomPart}`;
-
-    // Garante que duration seja número
     const durationInt = parseInt(duration);
-
-    console.log(`Criando chave: ${keyCode} para ${name} (${durationInt}h)`);
 
     try {
         await db.execute({
@@ -126,8 +136,8 @@ app.post('/api/admin/keys', adminAuth, async (req, res) => {
         });
         res.json({ success: true, key: keyCode });
     } catch (error) {
-        console.error("ERRO AO CRIAR CHAVE:", error);
-        res.status(500).json({ error: "Erro ao salvar no banco. Verifique logs." });
+        console.error("ERRO AO CRIAR:", error);
+        res.status(500).json({ error: "Erro ao criar chave no banco." });
     }
 });
 
