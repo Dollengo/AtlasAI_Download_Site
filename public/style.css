@@ -139,15 +139,19 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 60px; /* Reduzido de 70px para 60px */
-    padding: 0 30px; /* Padding lateral equilibrado */
-    background: rgba(2, 4, 10, 0.9);
+    height: 60px;             /* Altura fixa pequena */
+    padding: 0 30px;
+    background: rgba(2, 4, 10, 0.95); /* Aumentei um pouco a opacidade para leitura */
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255,255,255,0.05);
-    position: sticky;
+    
+    /* MUDANÇA CRÍTICA AQUI: */
+    position: fixed;          /* Fixa em relação à janela do navegador */
     top: 0;
-    z-index: 1000;
-    width: 100%;
+    left: 0;
+    width: 100%;              /* Garante que ocupe a largura total */
+    z-index: 1000;            /* Garante que fique acima de tudo */
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); /* Sombra suave para destacar do fundo */
 }
 
 .nav-logo {
@@ -226,7 +230,10 @@ nav {
     text-align: center;
     padding: 20px;
     position: relative;
-    margin-top: -30px; /* Compensa visualmente a barra */
+    
+    /* AJUSTE DE ESPAÇAMENTO: */
+    margin-top: 0;            /* Remova o margin negativo antigo (-30px) */
+    padding-top: 100px;       /* Adiciona espaço extra no topo (60px da nav + 40px de respiro) */
 }
 
 .hero-logo {
