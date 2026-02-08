@@ -54,13 +54,26 @@ const loginScreen = document.getElementById('login-screen');
 const downloadScreen = document.getElementById('download-screen');
 const msgBox = document.getElementById('login-msg');
 
-// URL Params para Modo Admin (?dev=SENHA)
+// 1. LÓGICA DE TOKEN DO ADMIN (MELHORADA)
 const urlParams = new URLSearchParams(window.location.search);
-const devToken = urlParams.get('dev');
+let devToken = urlParams.get('dev');
 
+// Se tiver token na URL, salva no localStorage. Se não, tenta recuperar do localStorage.
 if (devToken) {
-    document.getElementById('dev-panel').classList.add('active');
-    loadKeys();
+    localStorage.setItem('admin_token', devToken);
+} else {
+    devToken = localStorage.getItem('admin_token');
+}
+
+// Se tivermos um token (da URL ou salvo), ativa o painel
+if (devToken) {
+    console.log("Modo Admin Ativo com token:", devToken);
+    const panel = document.getElementById('dev-panel');
+    if(panel) {
+        panel.classList.add('active');
+        // Pequeno delay para garantir que o DOM carregou
+        setTimeout(loadKeys, 500); 
+    }
 }
 
 // Verifica se já tem login salvo e se é válido
@@ -133,23 +146,39 @@ async function verifyKey(manualKey = null, isAuto = false) {
 
 // Iniciar Download
 function startDownload() {
-    window.location.href = '/assets/AtlasAI Setup.exe';
+    window.location.href = '/assets/AtlasAI_Setup.exe';
 }
 
 // --- FUNÇÕES ADMIN ---
 
 async function loadKeys() {
+    console.log("Carregando chaves...");
     try {
         const res = await fetch('/api/admin/keys', {
-            headers: { 'admin-token': devToken }
+            headers: { 'admin-token': devToken } // Envia o token salvo
         });
         
-        if (!res.ok) return;
+        if (res.status === 403) {
+            console.error("Erro 403: Senha de Admin incorreta.");
+            // Se a senha estiver errada, limpa do storage para não travar
+            localStorage.removeItem('admin_token');
+            alert("Sessão Admin expirada ou senha incorreta. Acesse via ?dev=NOVA_SENHA");
+            return;
+        }
+
+        if (!res.ok) throw new Error("Erro na resposta do servidor");
 
         const keys = await res.json();
         const tbody = document.querySelector('#keys-table tbody');
+        
+        if(!tbody) return; 
         tbody.innerHTML = '';
         
+        if (keys.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Nenhuma chave encontrada</td></tr>';
+            return;
+        }
+
         keys.forEach(k => {
             const row = `<tr>
                 <td><span class="key-display">${k.key_code}</span></td>
@@ -172,7 +201,7 @@ async function generateKey() {
     const duration = document.getElementById('new-key-duration').value;
     const btn = document.querySelector('.btn-generate');
 
-    if(!name) return alert("Enter a client name");
+    if(!name) return alert("Digite um nome para o cliente");
 
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     btn.disabled = true;
@@ -190,13 +219,13 @@ async function generateKey() {
         const data = await res.json();
 
         if (res.ok) {
-            await loadKeys();
+            await loadKeys(); // Recarrega a lista
             document.getElementById('new-key-name').value = '';
         } else {
-            alert("Error: " + JSON.stringify(data));
+            alert("Erro: " + (data.error || JSON.stringify(data)));
         }
     } catch (e) {
-        alert("Connection Error");
+        alert("Erro de Conexão");
     } finally {
         btn.innerHTML = '<i class="fas fa-plus"></i> Generate Key';
         btn.disabled = false;

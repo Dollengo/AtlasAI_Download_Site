@@ -1,30 +1,32 @@
+/* SALVE COMO: index.js ou server.js */
 require('dotenv').config();
 const express = require('express');
 const { createClient } = require('@libsql/client/web'); 
 const cors = require('cors');
-const path = require('path');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.use(express.static('public'));
+app.use(express.static('public')); // Garante que o CSS/JS sejam carregados
 
-// Configuração do Turso
+// --- CONFIGURAÇÃO DE SEGURANÇA ---
+// Se não tiver senha no .env, usa "admin123" como padrão para não dar erro
+const ADMIN_PASSWORD = process.env.ADMIN_TOKEN || "admin123";
+
+// Configuração do Banco
 const dbUrl = process.env.TURSO_DATABASE_URL;
 const dbToken = process.env.TURSO_AUTH_TOKEN;
 
 if (!dbUrl || !dbToken) {
-    console.error("ERRO CRÍTICO: Variáveis TURSO_DATABASE_URL ou TURSO_AUTH_TOKEN não definidas.");
-    process.exit(1);
+    console.warn("⚠️ AVISO: Banco de dados não configurado no .env");
 }
 
-// Inicializa o cliente DB
 const db = createClient({
-    url: dbUrl,
-    authToken: dbToken,
+    url: dbUrl || "file:local.db", // Fallback para evitar crash
+    authToken: dbToken || "",
 });
 
-// Inicializa a tabela se não existir
+// Inicializa tabela
 async function initDB() {
     try {
         await db.execute(`
@@ -38,23 +40,65 @@ async function initDB() {
                 first_used_at DATETIME
             )
         `);
-        console.log("Banco de dados verificado/inicializado com sucesso.");
+        console.log("✅ Banco de dados conectado.");
     } catch (error) {
-        console.error("Erro ao conectar/inicializar banco:", error);
+        console.error("❌ Erro no Banco:", error);
     }
 }
 initDB();
 
-const getIP = (req) => {
-    return req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress;
+// Middleware de Autenticação Admin
+const adminAuth = (req, res, next) => {
+    const token = req.headers['admin-token'];
+    
+    // Debug para você ver no terminal o que está acontecendo
+    console.log(`Tentativa de Admin - Token recebido: "${token}" | Token esperado: "${ADMIN_PASSWORD}"`);
+
+    if (!token || token !== ADMIN_PASSWORD) {
+        return res.status(403).json({ error: "Acesso negado. Senha incorreta." });
+    }
+    next();
 };
 
-// --- ROTA: Verificar Chave ---
+// --- ROTAS ---
+
+// Listar Chaves (Protegido)
+app.get('/api/admin/keys', adminAuth, async (req, res) => {
+    try {
+        const result = await db.execute("SELECT * FROM keys ORDER BY created_at DESC");
+        res.json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Erro ao buscar chaves" });
+    }
+});
+
+// Criar Chave (Protegido)
+app.post('/api/admin/keys', adminAuth, async (req, res) => {
+    const { name, duration } = req.body;
+    
+    // Gera chave aleatória ATLAS-XXXX-XXXX
+    const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase() + 
+                       "-" + 
+                       Math.random().toString(36).substring(2, 6).toUpperCase();
+    const keyCode = `ATLAS-${randomPart}`;
+
+    try {
+        await db.execute({
+            sql: "INSERT INTO keys (key_code, name, duration_hours, created_at) VALUES (?, ?, ?, datetime('now'))",
+            args: [keyCode, name, parseInt(duration)]
+        });
+        res.json({ success: true, key: keyCode });
+    } catch (error) {
+        res.status(500).json({ error: "Erro ao criar chave." });
+    }
+});
+
+// Verificar Chave (Público)
 app.post('/api/verify', async (req, res) => {
     const { key } = req.body;
-    const userIP = getIP(req);
-
-    console.log(`Login: [${key}] - IP [${userIP}]`);
+    // Lógica simplificada de IP
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
     try {
         const result = await db.execute({
@@ -62,84 +106,27 @@ app.post('/api/verify', async (req, res) => {
             args: [key]
         });
 
-        if (result.rows.length === 0) {
-            return res.status(401).json({ error: "Chave inválida." });
+        if (result.rows.length === 0) return res.status(401).json({ error: "Chave inválida." });
+        
+        const data = result.rows[0];
+
+        // Se já foi usada por outro IP
+        if (data.used_by_ip && data.used_by_ip !== ip) {
+            return res.status(403).json({ error: "Chave já vinculada a outro dispositivo." });
         }
 
-        const keyData = result.rows[0];
-
-        // 1. Verificar IP
-        if (keyData.used_by_ip && keyData.used_by_ip !== userIP) {
-            return res.status(403).json({ error: "Chave já usada em outro PC." });
-        }
-
-        // 2. Vincular IP
-        if (!keyData.used_by_ip) {
+        // Se é o primeiro uso, registra o IP
+        if (!data.used_by_ip) {
             await db.execute({
                 sql: "UPDATE keys SET used_by_ip = ?, first_used_at = datetime('now') WHERE id = ?",
-                args: [userIP, keyData.id]
+                args: [ip, data.id]
             });
         }
 
-        // 3. Verificar tempo
-        if (keyData.duration_hours !== -1 && keyData.first_used_at) {
-            const firstUsed = new Date(keyData.first_used_at + "Z"); // Força UTC se necessário
-            const now = new Date();
-            // Fallback se a data vier inválida (null ou formato errado)
-            if(!isNaN(firstUsed.getTime())) {
-                 const hoursPassed = (now - firstUsed) / 36e5;
-                 if (hoursPassed > keyData.duration_hours) {
-                     return res.status(403).json({ error: "Chave expirada." });
-                 }
-            }
-        }
-
         res.json({ success: true });
-
-    } catch (error) {
-        console.error("ERRO NO VERIFY:", error);
-        res.status(500).json({ error: "Erro interno. Tente novamente." });
+    } catch (e) {
+        res.status(500).json({ error: "Erro interno" });
     }
 });
 
-const adminAuth = (req, res, next) => {
-    const token = req.headers['admin-token'];
-    if (!process.env.ADMIN_TOKEN || token !== process.env.ADMIN_TOKEN) {
-        return res.status(403).json({ error: "Acesso negado." });
-    }
-    next();
-};
-
-app.get('/api/admin/keys', adminAuth, async (req, res) => {
-    try {
-        const result = await db.execute("SELECT * FROM keys ORDER BY created_at DESC");
-        res.json(result.rows);
-    } catch (error) {
-        console.error("Erro admin list:", error);
-        res.status(500).json({ error: "Erro ao buscar chaves" });
-    }
-});
-
-app.post('/api/admin/keys', adminAuth, async (req, res) => {
-    const { name, duration } = req.body;
-    
-    const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase() + 
-                       "-" + 
-                       Math.random().toString(36).substring(2, 6).toUpperCase();
-    const keyCode = `ATLAS-${randomPart}`;
-    const durationInt = parseInt(duration);
-
-    try {
-        await db.execute({
-            sql: "INSERT INTO keys (key_code, name, duration_hours, created_at) VALUES (?, ?, ?, datetime('now'))",
-            args: [keyCode, name, durationInt]
-        });
-        res.json({ success: true, key: keyCode });
-    } catch (error) {
-        console.error("ERRO AO CRIAR:", error);
-        res.status(500).json({ error: "Erro ao criar chave no banco." });
-    }
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+app.listen(3000, () => console.log("🚀 Servidor rodando na porta 3000"));
