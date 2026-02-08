@@ -1,6 +1,13 @@
 /* --- FONTS & IMPORTS --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
 
+/* --- RESET GLOBAL (CRÍTICO PARA O LAYOUT) --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 /* --- VARIÁVEIS GLOBAIS (TEMA CYBERPUNK) --- */
 :root {
     --bg-deep: #02040a;       /* Fundo quase preto */
@@ -10,19 +17,16 @@
     --danger: #ff2a6d;        /* Rosa/Vermelho para erros/logout */
     --text-main: #ffffff;
     --text-muted: #94a3b8;
-    --glass: rgba(11, 16, 33, 0.7); /* Efeito de vidro */
+    --glass: rgba(11, 16, 33, 0.75); /* Efeito de vidro */
     --border-glow: rgba(0, 240, 255, 0.3);
 }
 
 /* --- CONFIGURAÇÃO GERAL --- */
 body {
-    margin: 0;
-    padding: 0;
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-deep);
     color: var(--text-main);
     overflow-x: hidden;
-    /* Gradientes de fundo sutis */
     background-image: 
         radial-gradient(circle at 50% 0%, rgba(0, 102, 255, 0.15) 0%, transparent 60%),
         radial-gradient(circle at 85% 90%, rgba(0, 240, 255, 0.05) 0%, transparent 40%);
@@ -42,22 +46,21 @@ body {
     pointer-events: none;
 }
 
-/* --- GESTÃO DE TELAS (LOGIN vs DOWNLOAD) --- */
+/* --- GESTÃO DE TELAS --- */
 .screen {
     display: none;
     width: 100%;
     animation: fadeIn 0.6s ease;
 }
 
-/* Tela de login precisa de Flex para centralizar */
 #login-screen.active {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    flex-direction: column;
 }
 
-/* Tela de download é bloco normal */
 #download-screen.active {
     display: block;
 }
@@ -73,7 +76,6 @@ body {
     box-shadow: 0 0 80px rgba(0, 102, 255, 0.1);
     max-width: 420px;
     width: 90%;
-    position: relative;
 }
 
 .login-box h1 {
@@ -86,7 +88,6 @@ body {
 .input-group {
     display: flex;
     margin-top: 30px;
-    position: relative;
 }
 
 .input-group input {
@@ -133,23 +134,29 @@ body {
     letter-spacing: 1px;
 }
 
-/* --- NAV BAR (Fina e Elegante) --- */
+/* --- NAV BAR (CORRIGIDA E FINA) --- */
 nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 70px;
-    padding: 0 40px;
-    background: rgba(2, 4, 10, 0.85);
+    height: 60px; /* Reduzido de 70px para 60px */
+    padding: 0 30px; /* Padding lateral equilibrado */
+    background: rgba(2, 4, 10, 0.9);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255,255,255,0.05);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
+    width: 100%;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
 }
 
 .nav-logo img {
-    height: 32px;
+    height: 26px; /* Logo menor para caber na barra fina */
     width: auto;
     filter: drop-shadow(0 0 5px var(--primary));
 }
@@ -163,7 +170,7 @@ nav {
 .nav-links a {
     color: var(--text-muted);
     text-decoration: none;
-    font-size: 0.85em;
+    font-size: 0.8rem; /* Fonte ligeiramente menor */
     font-weight: 600;
     transition: 0.3s;
     text-transform: uppercase;
@@ -179,7 +186,7 @@ nav {
     color: #10b981;
     font-size: 0.75em;
     background: rgba(16, 185, 129, 0.1);
-    padding: 5px 12px;
+    padding: 4px 12px;
     border-radius: 50px;
     border: 1px solid rgba(16, 185, 129, 0.2);
     display: flex;
@@ -192,14 +199,15 @@ nav {
     background: transparent;
     border: 1px solid rgba(255, 42, 109, 0.3);
     color: var(--danger);
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: 0.3s;
+    font-size: 0.9em;
 }
 
 .btn-logout:hover {
@@ -210,7 +218,7 @@ nav {
 
 /* --- HERO SECTION --- */
 .hero-section {
-    min-height: 85vh; /* Ocupa boa parte da tela */
+    min-height: 85vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -218,15 +226,16 @@ nav {
     text-align: center;
     padding: 20px;
     position: relative;
+    margin-top: -30px; /* Compensa visualmente a barra */
 }
 
 .hero-logo {
-    max-width: 350px; /* Tamanho controlado */
-    width: 100%;
+    max-width: 320px; /* Logo central controlada */
+    width: 90%;
     height: auto;
-    filter: drop-shadow(0 0 35px rgba(0, 102, 255, 0.2));
+    filter: drop-shadow(0 0 40px rgba(0, 102, 255, 0.25));
     animation: float 6s ease-in-out infinite;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .hero-subtitle {
@@ -249,7 +258,7 @@ nav {
     line-height: 1.6;
 }
 
-/* BOTÃO NEON PRINCIPAL */
+/* BOTÃO DOWNLOAD */
 .btn-download-neo {
     background: linear-gradient(90deg, #0066ff, #00c6ff);
     color: white;
@@ -286,7 +295,7 @@ nav {
     letter-spacing: 0;
 }
 
-/* AVISO OLLAMA */
+/* REQUIREMENTS */
 .requirements-text {
     margin-top: 30px;
     color: var(--text-muted);
@@ -319,7 +328,7 @@ nav {
     gap: 30px;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px 80px 20px;
+    padding: 0 20px 60px 20px;
 }
 
 .card {
@@ -330,7 +339,6 @@ nav {
     backdrop-filter: blur(12px);
     transition: 0.4s ease;
     cursor: default;
-    position: relative;
 }
 
 .card:hover {
@@ -376,18 +384,18 @@ nav {
 
 /* --- FOOTER --- */
 footer {
-    margin-top: auto; /* Empurra para o fundo se o conteúdo for curto */
+    margin-top: auto;
     padding: 40px 20px;
     text-align: center;
     border-top: 1px solid rgba(255,255,255,0.03);
-    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.4));
+    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.6));
     color: #475569;
     font-size: 0.8rem;
 }
 
-/* --- PAINEL DO ADMIN (Estilo Hacker) --- */
+/* --- PAINEL DO ADMIN --- */
 .dev-panel {
-    display: none; /* Escondido por padrão */
+    display: none;
     position: fixed;
     bottom: 30px;
     right: 30px;
@@ -402,9 +410,7 @@ footer {
     animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.dev-panel.active {
-    display: block;
-}
+.dev-panel.active { display: block; }
 
 .dev-header {
     display: flex;
@@ -421,9 +427,6 @@ footer {
     font-size: 1.1em;
     text-transform: uppercase;
     letter-spacing: 1px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
 }
 
 .btn-close-dev {
@@ -434,7 +437,6 @@ footer {
     font-size: 1.2em;
     transition: 0.2s;
 }
-
 .btn-close-dev:hover { color: #fff; }
 
 .dev-form {
@@ -456,7 +458,6 @@ footer {
     outline: none;
     font-size: 0.9em;
 }
-
 .dev-form input:focus { border-color: var(--primary); }
 
 .btn-generate {
@@ -469,7 +470,6 @@ footer {
     transition: 0.2s;
     font-size: 0.9em;
 }
-
 .btn-generate:hover { background: #fff; }
 
 .keys-table-container {
@@ -478,10 +478,7 @@ footer {
     border: 1px solid #1e293b;
     border-radius: 6px;
 }
-
-/* Scrollbar personalizada */
 .keys-table-container::-webkit-scrollbar { width: 6px; }
-.keys-table-container::-webkit-scrollbar-track { background: #0f172a; }
 .keys-table-container::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
 
 table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
@@ -490,24 +487,17 @@ td { padding: 10px 12px; border-bottom: 1px solid #1e293b; color: #e2e8f0; }
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: rgba(0, 240, 255, 0.05); }
 
-.key-display {
-    font-family: monospace;
-    color: var(--primary);
-    font-weight: bold;
-    letter-spacing: 1px;
-}
+.key-display { font-family: monospace; color: var(--primary); font-weight: bold; letter-spacing: 1px; }
 
 /* --- ANIMAÇÕES --- */
 @keyframes fadeIn {
     from { opacity: 0; transform: scale(0.98); }
     to { opacity: 1; transform: scale(1); }
 }
-
 @keyframes slideUp {
     from { transform: translateY(50px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
-
 @keyframes float {
     0% { transform: translateY(0px); }
     50% { transform: translateY(-12px); }
@@ -516,7 +506,7 @@ tr:hover td { background: rgba(0, 240, 255, 0.05); }
 
 /* --- RESPONSIVO --- */
 @media (max-width: 768px) {
-    .nav-links { display: none; } /* Simplificado para mobile */
+    .nav-links { display: none; }
     .hero-subtitle { font-size: 2rem; }
     .hero-logo { max-width: 250px; }
     .dev-panel { width: 90%; left: 5%; bottom: 10px; }
